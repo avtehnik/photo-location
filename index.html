@@ -22,7 +22,6 @@
             width: 100%;
             height: 100px;
             margin: 0 auto;
-            border: 1px dashed #333;
             position: absolute;
             z-index: 1;
 
@@ -35,6 +34,8 @@
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maptalks/dist/maptalks.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/maptalks/dist/maptalks.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/maptalks-tilelayercollection@0.0.1/dist/maptalks-tilelayercollection.min.js"></script>
+
     <title>3D Dji photos map visualizer</title>
 </head>
 <body>
@@ -45,6 +46,9 @@
 </div>
 <div id="map" class="container"></div>
 <script>
+
+
+
     var map = new maptalks.Map('map', {
         center: [32.05912497222222, 49.43518680555555],
         zoom: 14,
@@ -55,6 +59,8 @@
             attribution: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
         })
     });
+    // var tileLayer=maptalks.TileLayerCollection.getGoogleTileLayer('id',{style:'Terrain'||'Satellite'});
+    // map.setBaseLayer(tileLayer);
 
     var VectorLayer;
 
@@ -105,12 +111,10 @@
                         }
                     );
 
-                    map.animateTo({
-                        center: [exifdata.GPSLongitude, exifdata.GPSLatitude],
-                        zoom: 20,
-                        pitch: 90+ exifdata.dji.gimbalPitchDegree,
-                        bearing: exifdata.dji.gimbalYawDegree
-                    });
+                    // map.animateTo({
+                    //     center: [exifdata.GPSLongitude, exifdata.GPSLatitude],
+                    //     bearing: exifdata.dji.gimbalYawDegree
+                    // });
                     points.push(point);
 
                     resolve();
