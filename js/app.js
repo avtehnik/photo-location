@@ -84,7 +84,7 @@ if (typeof window.FileReader === 'undefined') {
     state.className = 'fail';
 } else {
     state.className = 'success';
-    state.innerHTML = 'Dji photos map mapper';
+    state.innerHTML = 'Dji photos 3d visualizer';
 }
 
 holder.ondragover = function() {
