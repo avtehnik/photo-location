@@ -102,86 +102,100 @@ holder.ondrop = function(e) {
     var vectors = [];
     var promises = [];
     vueApp.photos = [];
+    photosLayer.clear();
+    vectorsLayer.clear();
 
     Array.prototype.forEach.call(e.dataTransfer.files, function(file) {
-        promises.push(new Promise(function(resolve, reject) {
-            var parsed = EXIF.getData(file, function(img) {
-                var exifdata = EXIF.getAllTags(this);
-                if (exifdata.Make === 'DJI') {
-                    // point with altitude
-                    var altitude = exifdata.dji.relativeAltitude;
 
-                    // console.log(exifdata.dji, exifdata.GPSLongitude, exifdata.GPSLatitude);
-                    var point = new maptalks.Marker([exifdata.GPSLongitude, exifdata.GPSLatitude], {
-                            'properties': {
-                                'altitude': altitude,
-                                'name': file.name
-                            },
-                            'symbol': [
-                                {
-                                    'markerFile': '1.png',
-                                    'markerWidth': 28,
-                                    'markerHeight': 40,
-                                    'markerDx': 0,
-                                    'markerDy': 0,
-                                    'markerOpacity': 1
+        var re = /(?:\.([^.]+))?$/;
+        var ext = re.exec(file.name.toLowerCase())[1];
+        if (ext === 'jpg') {
+            console.log(file.name);
+            promises.push(new Promise(function(resolve, reject) {
+                var parsed = EXIF.getData(file, function(img) {
+                    var exifdata = EXIF.getAllTags(this);
+
+                    if (exifdata.Make && exifdata.Make.cleanup().hexEncode() == "0064006a0069002d" || exifdata.Make == "DJI") {
+                        // point with altitude
+                        var altitude = exifdata.dji.relativeAltitude;
+
+                        // console.log(exifdata.dji, exifdata.GPSLongitude, exifdata.GPSLatitude);
+                        var point = new maptalks.Marker([exifdata.GPSLongitude, exifdata.GPSLatitude], {
+                                'properties': {
+                                    'altitude': altitude,
+                                    'name': file.name
                                 },
-                                {
-                                    'textFaceName': 'sans-serif',
-                                    'textName': '{name}',
-                                    'textSize': 10,
-                                    'textDy': 0
-                                }
-                            ]
+                                'symbol': [
+                                    {
+                                        'markerFile': '1.png',
+                                        'markerWidth': 28,
+                                        'markerHeight': 40,
+                                        'markerDx': 0,
+                                        'markerDy': 0,
+                                        'markerOpacity': 1
+                                    },
+                                    {
+                                        'textFaceName': 'sans-serif',
+                                        'textName': '{name}',
+                                        'textSize': 10,
+                                        'textDy': 0
+                                    }
+                                ]
 
-                        }
-                    );
-                    points.push(point);
-                    var polyline = new maptalks.LineString([
-                        [exifdata.GPSLongitude, exifdata.GPSLatitude],
-                        destinationPoint(exifdata.GPSLatitude, exifdata.GPSLongitude, altitude / 5, exifdata.dji.gimbalYawDegree)
-                    ], {
-                        arrowStyle: 'classic', // we only have one arrow style now
-                        arrowPlacement: 'vertex-last',
-                        symbol: {
-                            lineColor: '#1bbc9b',
-                            lineWidth: 3
-                        }
-                    });
+                            }
+                        );
+                        points.push(point);
+                        var polyline = new maptalks.LineString([
+                            [exifdata.GPSLongitude, exifdata.GPSLatitude],
+                            destinationPoint(exifdata.GPSLatitude, exifdata.GPSLongitude, altitude / 5, exifdata.dji.gimbalYawDegree)
+                        ], {
+                            arrowStyle: 'classic', // we only have one arrow style now
+                            arrowPlacement: 'vertex-last',
+                            symbol: {
+                                lineColor: '#1bbc9b',
+                                lineWidth: 3
+                            }
+                        });
 
 
-                    polyline.on('click', function(e) {
-                        animateMapTo(exifdata);
-                        vueApp.selected = file.name;
-                    });
+                        polyline.on('click', function(e) {
+                            animateMapTo(exifdata);
+                            vueApp.selected = file.name;
+                        });
 
-                    point.on('click', function(e) {
-                        animateMapTo(exifdata);
-                        vueApp.selected = file.name;
-                    });
+                        point.on('click', function(e) {
+                            animateMapTo(exifdata);
+                            vueApp.selected = file.name;
+                        });
 
-                    vectors.push(polyline);
-                    vueApp.photos.push({
-                        'name': file.name,
-                        'exifdata': exifdata
-                    });
+                        vectors.push(polyline);
+                        vueApp.photos.push({
+                            'name': file.name,
+                            'exifdata': exifdata
+                        });
 
+
+                        photosLayer.addGeometry(point, true);
+                        vectorsLayer.addGeometry(polyline, true);
+
+                    }
+                    resolve();
+                })
+
+                if (!parsed) {
+                    resolve();
                 }
-                resolve();
-            })
-            if (!parsed) {
-                resolve();
-            }
-        }));
+            }));
+        }
     });
 
     Promise.all(promises).then(function(values) {
-        photosLayer.clear();
-        vectorsLayer.clear();
-
-        photosLayer.addGeometry(points, true);
-        vectorsLayer.addGeometry(vectors, true);
-
+        // photosLayer.clear();
+        // vectorsLayer.clear();
+        //
+        // photosLayer.addGeometry(points, true);
+        // vectorsLayer.addGeometry(vectors, true);
+        //
         map.fitExtent(photosLayer.getExtent(), 0);
 
     });

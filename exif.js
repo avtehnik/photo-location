@@ -386,31 +386,41 @@
             img.iptcdata = iptcdata || {};
             EXIF.isXmpEnabled = true;
             if (EXIF.isXmpEnabled) {
-
-
-//                console.log(exifdata.xmpdata['x:xmpmeta']['rdf:RDF']['rdf:Description']['@attributes']);
-
-
                 img.exifdata.xmpdata = findXMPinJPEG(binFile);
-                var attributes = img.exifdata.xmpdata['x:xmpmeta']['rdf:RDF']['rdf:Description']['@attributes'];
                 img.exifdata.dji = {
-
-                    "absoluteAltitude": parseFloat(attributes['drone-dji:AbsoluteAltitude']),
-                    "relativeAltitude": parseFloat(attributes['drone-dji:RelativeAltitude']),
-                    "gimbalRollDegree": parseFloat(attributes['drone-dji:GimbalRollDegree']),
-                    "gimbalYawDegree": parseFloat(attributes['drone-dji:GimbalYawDegree']),
-                    "gimbalPitchDegree": parseFloat(attributes['drone-dji:GimbalPitchDegree']),
-                    "flightRollDegree": parseFloat(attributes['drone-dji:FlightRollDegree']),
-                    "flightYawDegree": parseFloat(attributes['drone-dji:FlightYawDegree']),
-                    "flightPitchDegree": parseFloat(attributes['drone-dji:FlightPitchDegree']),
-                    "flightXSpeed": parseFloat(attributes['drone-dji:FlightXSpeed']),
-                    "flightYSpeed": parseFloat(attributes['drone-dji:FlightYSpeed']),
-                    "flightZSpeed": parseFloat(attributes['drone-dji:FlightZSpeed']),
-                    "camReverse": parseFloat(attributes['drone-dji:CamReverse']),
-                    "gimbalReverse": parseFloat(attributes['drone-dji:GimbalReverse'])
-
-
+                    "relativeAltitude": 0,
+                    "absoluteAltitude": 0,
+                    "gimbalRollDegree": 0,
+                    "gimbalYawDegree": 0,
+                    "gimbalPitchDegree": 0,
+                    "flightRollDegree": 0,
+                    "flightYawDegree": 0,
+                    "flightPitchDegree": 0,
+                    "flightXSpeed": 0,
+                    "flightYSpeed": 0,
+                    "flightZSpeed": 0,
+                    "camReverse": 0,
+                    "gimbalReverse": 0
                 };
+
+                if (img.exifdata.xmpdata) {
+                    var attributes = img.exifdata.xmpdata['x:xmpmeta']['rdf:RDF']['rdf:Description']['@attributes'];
+                    img.exifdata.dji = {
+                        "absoluteAltitude": parseFloat(attributes['drone-dji:AbsoluteAltitude']),
+                        "relativeAltitude": parseFloat(attributes['drone-dji:RelativeAltitude']),
+                        "gimbalRollDegree": parseFloat(attributes['drone-dji:GimbalRollDegree']),
+                        "gimbalYawDegree": parseFloat(attributes['drone-dji:GimbalYawDegree']),
+                        "gimbalPitchDegree": parseFloat(attributes['drone-dji:GimbalPitchDegree']),
+                        "flightRollDegree": parseFloat(attributes['drone-dji:FlightRollDegree']),
+                        "flightYawDegree": parseFloat(attributes['drone-dji:FlightYawDegree']),
+                        "flightPitchDegree": parseFloat(attributes['drone-dji:FlightPitchDegree']),
+                        "flightXSpeed": parseFloat(attributes['drone-dji:FlightXSpeed']),
+                        "flightYSpeed": parseFloat(attributes['drone-dji:FlightYSpeed']),
+                        "flightZSpeed": parseFloat(attributes['drone-dji:FlightZSpeed']),
+                        "camReverse": parseFloat(attributes['drone-dji:CamReverse']),
+                        "gimbalReverse": parseFloat(attributes['drone-dji:GimbalReverse'])
+                    };
+                }
             }
             if (callback) {
                 callback.call(img);
